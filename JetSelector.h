@@ -15,9 +15,12 @@ public:
   JetSelector() {}
   ~JetSelector() {}
 
+  bool PassLoose(int i) { Pass(i); return fIsLoose; }
+  bool PassTight(int i) { Pass(i); return fIsTight; }
+
   void Pass(int icand)
   {
-    if (fVerbose) cout << "== selector Pass() called" <<endl;
+    if (fVerbose) cout << "== Jet selector Pass() called" <<endl;
 
     bool jetID_pass = false;
     

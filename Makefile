@@ -5,12 +5,12 @@ LDFLAGS = `root-config --libs`
 # setup boost libraries
 # check version using scram tool info boost
 INC += -I/cvmfs/cms.cern.ch/slc6_amd64_gcc491/external/boost/1.57.0-jlbgio/include
-LDFLAGS += -L$(CMSSW_RELEASE_BASE)/external/slc6_amd64_gcc491/lib/ -lboost_program_options
+LDFLAGS += -L$(CMSSW_RELEASE_BASE)/external/slc6_amd64_gcc491/lib/ -lboost_program_options -lboost_date_time -lboost_iostreams
 
-SOURCES = EventTree.C FileLoader.cc
+SOURCES = EventTree.C FileLoader.cc MuonHistos.cc JetHistos.cc
 #OBJECTS = $(SOURCES:.C=.o)
 #OBJECTS += $(SOURCES:.cc=.o)
-OBJECTS = EventTree.o FileLoader.o
+OBJECTS = EventTree.o FileLoader.o MuonHistos.o JetHistos.o
 #EXECUTABLE = tanalyzer
 
 

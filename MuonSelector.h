@@ -2,7 +2,6 @@
 #define MUONSELECTOR_H
 
 #include "BaseSelector.h"
-//#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -15,14 +14,13 @@ public:
   MuonSelector() {}
   ~MuonSelector() {}
 
-  bool PassLoose( int imu)
-  {
-    Pass(imu);
-    return fIsLoose;
-  }
- 
+  bool PassLoose(int i) { Pass(i); return fIsLoose; }
+  bool PassTight(int i) { Pass(i); return fIsTight; }
+
   void Pass(int imu)
   {
+    if (fVerbose) cout << "== Muon selector called" <<endl;
+
     // get pt and eta
     double pt = ftree->muPt->at(imu);
     double eta = ftree->muEta->at(imu);
@@ -35,29 +33,42 @@ public:
     bool isTrackerMuon = ftree->muType->at(imu) & TrackerMuon;
     bool isPFMuon      = ftree->muType->at(imu) & PFMuon;
 
-    frelIsocorr = ( ftree->muPFChIso->at(imu) + fmax(0.0, ftree->muPFNeuIso->at(imu) + ftree->muPFPhoIso->at(imu) -0.5*ftree->muPFPUIso->at(imu) ) ) / pt;
+    double relIsocorr = ( ftree->muPFChIso->at(imu) + fmax(0.0, ftree->muPFNeuIso->at(imu) + ftree->muPFPhoIso->at(imu) -0.5*ftree->muPFPUIso->at(imu) ) ) / pt;
+
+    frelIsoM[imu] = relIsocorr;
+
+    //cout << "fill map" << endl;
+    //if ( fuservar.count("muRelIsoCC") == 0 ) { cout<< "create map entry" << endl; fuservar["muRelIsoCC"] = std::vector<float>();}
+    //fuservar.insert ( std::pair< std::string, vector>('a',100) );
+    //fuservar["muRelIso"].push_back(frelIsocorr);
 
     double rho_zero = std::max(0.0, (double) ftree->rho);
                 
-    bool IsoPass = frelIsocorr >= 0.0 && frelIsocorr <= 0.15;
-
-    //if (mu_Iso_invert) IsoPass = !IsoPass;
-
     fIsLoose = 
       pt > 10.0 && 
       TMath::Abs(eta) < 2.4 && 
-      frelIsocorr < 0.25 
-      && isPFMuon && ( isGlobalMuon || isTrackerMuon);
+      relIsocorr < 0.25 &&
+      isPFMuon && ( isGlobalMuon || isTrackerMuon);
 
+    fIsTight =
+      pt > 26.0 && 
+      TMath::Abs(eta) < 2.1 && 
+      relIsocorr < 0.15 &&
+      ftree->muChi2NDF->at(imu) < 10 &&
+      ftree->muTrkLayers->at(imu) > 5 &&
+      ftree->muMuonHits->at(imu) > 0 &&
+      ftree->muD0->at(imu) < 0.2 &&
+      fabs( ftree->muDz->at(imu) ) < 0.5 && //check this
+      ftree->muPixelHits->at(imu) > 0 &&
+      ftree->muStations->at(imu) > 1 &&
+      isPFMuon && isGlobalMuon && isTrackerMuon;
     
   }
 
-
-  float get_relIso() { return frelIso; }
-  float get_relIsocorr() { return frelIsocorr; }
+  std::map< int, float> GetRelIsoMap() { return frelIsoM; }
 
 private:
-  float frelIso;
-  float frelIsocorr;
+  std::map< int, float> frelIsoM;
+
 };
 #endif

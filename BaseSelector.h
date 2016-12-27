@@ -17,10 +17,10 @@ public:
     fIsLoose = false;
     fIsTight = false;
   }
-  void Pass() {}
-  bool PassLoose() {}
-  bool PassTight() {}
-
+  void Pass(int i) {}
+  bool PassLoose(int i) { Pass(i); return fIsLoose; }
+  bool PassTight(int i) { Pass(i); return fIsTight; }
+  
 protected:
   EventTree *ftree;
   bool fVerbose;

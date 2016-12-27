@@ -15,6 +15,8 @@ public:
   ElectronSelector() {}
   ~ElectronSelector() {}
 
+  bool PassLoose(int i) { Pass(i); return fIsLoose; }
+  bool PassTight(int i) { Pass(i); return fIsTight; }
 
   double eleEffArea03(double SCEta) {
     double eta = TMath::Abs(SCEta);
